@@ -1,190 +1,483 @@
 import pygame
+import cv2
 import sys
 
 pygame.init()
+pygame.mixer.init()
 
-# Tela
+# ==========================
+# TELA
+# ==========================
+
 LARGURA = 800
 ALTURA = 600
-tela = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("BRASIDENTE")
 
-# Fundo
-fundo = pygame.image.load("assets/imagens/fundo.png")
-fundo = pygame.transform.scale(fundo, (LARGURA, ALTURA))
+tela = pygame.display.set_mode(
+    (LARGURA, ALTURA)
+)
 
-# Cores
-BRANCO = (255, 255, 255)
-PRETO = (0, 0, 0)
-AZUL = (40, 90, 200)
-AZUL_HOVER = (20, 70, 170)
-CINZA = (180, 180, 180)
-CINZA_HOVER = (140, 140, 140)
+pygame.display.set_caption(
+    "BRASIDENTE"
+)
 
-# Fonte
-fonte_titulo = pygame.font.SysFont("consolas", 50, bold=True)
-fonte_botao = pygame.font.SysFont("consolas", 24)
+clock = pygame.time.Clock()
 
-# Texto pixel (contorno)
-def desenhar_texto_pixel(texto, fonte, cor, contorno, x, y):
-    base = fonte.render(texto, True, cor)
-    sombra = fonte.render(texto, True, contorno)
+# ==========================
+# CURSORES
+# ==========================
 
-    for dx in [-2, 2]:
-        for dy in [-2, 2]:
-            tela.blit(sombra, (x + dx, y + dy))
+cursor_seta = pygame.cursors.Cursor(
+    pygame.SYSTEM_CURSOR_ARROW
+)
 
-    tela.blit(base, (x, y))
+cursor_mao = pygame.cursors.Cursor(
+    pygame.SYSTEM_CURSOR_HAND
+)
 
-def desenhar_texto_centro(texto, fonte, cor, rect):
-    render = fonte.render(texto, True, cor)
-    texto_rect = render.get_rect(center=rect.center)
-    tela.blit(render, texto_rect)
+# ==========================
+# VÍDEO MENU
+# ==========================
 
-def desenhar_botao(rect, cor, texto, fonte, cor_texto):
-    pygame.draw.rect(tela, cor, rect, border_radius=8)
-    pygame.draw.rect(tela, PRETO, rect, 3, border_radius=8)
-    desenhar_texto_centro(texto, fonte, cor_texto, rect)
+video = cv2.VideoCapture(
+    "assets/imagens/fundo.mp4"
+)
+
+# ==========================
+# CORES
+# ==========================
+
+BRANCO=(255,255,255)
+PRETO=(0,0,0)
+
+# ==========================
+# FONTES
+# ==========================
+
+fonte_titulo=pygame.font.SysFont(
+    "consolas",
+    50,
+    bold=True
+)
+
+# ==========================
+# TEXTO PIXEL
+# ==========================
+
+def desenhar_texto_pixel(
+    texto,
+    fonte,
+    cor,
+    contorno,
+    x,
+    y
+):
+
+    base=fonte.render(
+        texto,
+        True,
+        cor
+    )
+
+    sombra=fonte.render(
+        texto,
+        True,
+        contorno
+    )
+
+    for dx in [-2,2]:
+        for dy in [-2,2]:
+
+            tela.blit(
+                sombra,
+                (x+dx,y+dy)
+            )
+
+    tela.blit(
+        base,
+        (x,y)
+    )
+
+
+# ==========================
+# ESCOLHA PERSONAGEM
+# ==========================
 
 def escolha_personagem():
-    # Som de fundo do menu e escolha do personagem
-    pygame.mixer.init()
-    pygame.mixer.music.load("assets/sons/menu_e_escolha_dos_personagens.mp3")
-    pygame.mixer.music.set_volume(0.3)
-    pygame.mixer.music.play(-1)
-    # Imagens
-    fundo = pygame.image.load("assets/imagens/fundo_escolha_do_personagem.jpeg")
-    fundo = pygame.transform.scale(fundo, (LARGURA, ALTURA))
 
-    img_masc = pygame.image.load("assets/imagens/personagem_masculino.png")
-    img_fem = pygame.image.load("assets/imagens/personagem_feminino.png")
+    fundo=pygame.image.load(
+        "assets/imagens/fundo_escolha_do_personagem.png"
+    )
 
-    img_masc = pygame.transform.scale(img_masc, (200, 200))
-    img_fem = pygame.transform.scale(img_fem, (200, 200))
+    fundo=pygame.transform.scale(
+        fundo,
+        (LARGURA,ALTURA)
+    )
 
-    # Botões
-    botao_masc_img = pygame.image.load("assets/imagens/botao_masculino.png")
-    botao_fem_img = pygame.image.load("assets/imagens/botao_feminino.png")
+    area_masc=pygame.Rect(
+        125,
+        215,
+        190,
+        220
+    )
 
-    botao_masc_img = pygame.transform.scale(botao_masc_img, (200, 60))
-    botao_fem_img = pygame.transform.scale(botao_fem_img, (200, 60))
+    area_fem=pygame.Rect(
+        485,
+        215,
+        190,
+        220
+    )
 
-    # Posições
-    pos_masc = (180, 180)
-    pos_fem = (420, 180)
-
-    botao_masc = botao_masc_img.get_rect(center=(280, 420))
-    botao_fem = botao_fem_img.get_rect(center=(520, 420))
-
-    # Overlay
-    overlay = pygame.Surface((200, 60), pygame.SRCALPHA)
-    overlay.fill((255, 255, 255, 60))
-
-    # Loop
     while True:
-        tela.blit(fundo, (0, 0))
-        mouse_pos = pygame.mouse.get_pos()
 
-        # Personagens
-        tela.blit(img_masc, pos_masc)
-        tela.blit(img_fem, pos_fem)
+        tela.blit(
+            fundo,
+            (0,0)
+        )
 
-        # Botão masculino
-        tela.blit(botao_masc_img, botao_masc)
-        if botao_masc.collidepoint(mouse_pos):
-            tela.blit(overlay, botao_masc)
+        mouse=pygame.mouse.get_pos()
 
-        # Botão feminino
-        tela.blit(botao_fem_img, botao_fem)
-        if botao_fem.collidepoint(mouse_pos):
-            tela.blit(overlay, botao_fem)
+        if (
+            area_masc.collidepoint(mouse)
+            or
+            area_fem.collidepoint(mouse)
+        ):
 
-        # Cursor
-        if botao_masc.collidepoint(mouse_pos) or botao_fem.collidepoint(mouse_pos):
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            pygame.mouse.set_cursor(
+                cursor_mao
+            )
+
         else:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
-        # Título central
-        titulo = "ESCOLHA SEU PRESIDENTE"
-        render = fonte_titulo.render(titulo, True, BRANCO)
-        x = (LARGURA - render.get_width()) // 2
-        desenhar_texto_pixel(titulo, fonte_titulo, BRANCO, PRETO, x, 60)
+            pygame.mouse.set_cursor(
+                cursor_seta
+            )
 
-        # Texto inferior
-        dica = "Clique em uma opção para escolher"
-        render_dica = fonte_botao.render(dica, True, BRANCO)
-        x_dica = (LARGURA - render_dica.get_width()) // 2
-        tela.blit(render_dica, (x_dica, 500))
-
-        # Eventos
         for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
+
+            if evento.type==pygame.QUIT:
+
                 pygame.quit()
                 sys.exit()
 
-            if evento.type == pygame.MOUSEBUTTONDOWN:
-                if botao_masc.collidepoint(mouse_pos):
+
+            if evento.type==pygame.MOUSEBUTTONDOWN:
+
+                if area_masc.collidepoint(mouse):
+
                     return "masculino"
 
-                if botao_fem.collidepoint(mouse_pos):
+                if area_fem.collidepoint(mouse):
+
                     return "feminino"
 
         pygame.display.update()
+        clock.tick(60)
 
-def menu():
-    pygame.mixer.init()
-    pygame.mixer.music.load("assets/sons/menu_e_escolha_dos_personagens.mp3")
-    pygame.mixer.music.set_volume(0.3)
-    pygame.mixer.music.play(-1)
+
+# ==========================
+# NOME PRESIDENTE
+# ==========================
+
+def criar_nome_presidente():
+
+    fundo=pygame.image.load(
+        "assets/imagens/fundo_nome_presidente.png"
+    )
+
+    fundo=pygame.transform.scale(
+        fundo,
+        (LARGURA,ALTURA)
+    )
+
+    fonte_input=pygame.font.SysFont(
+        "consolas",
+        34
+    )
+
+    nome=""
+
+    caixa_texto=pygame.Rect(
+        175,
+        370,
+        500,
+        80
+    )
+
+    botao_voltar=pygame.Rect(
+        35,
+        530,
+        135,
+        45
+    )
+
+    ativo=False
 
     while True:
-        tela.blit(fundo, (0, 0))
 
-        # Título
-        texto = "BRASIDENTE"
-        render = fonte_titulo.render(texto, True, BRANCO)
-        largura_texto = render.get_width()
+        tela.blit(
+            fundo,
+            (0,0)
+        )
 
-        x = (LARGURA - largura_texto) // 2
+        mouse=pygame.mouse.get_pos()
 
-        desenhar_texto_pixel(texto, fonte_titulo, BRANCO, PRETO, x, 80)
+        if (
+            caixa_texto.collidepoint(mouse)
+            or
+            botao_voltar.collidepoint(mouse)
+        ):
 
-        # Botões
-        botao_iniciar = pygame.Rect(300, 250, 200, 60)
-        botao_sair = pygame.Rect(300, 330, 200, 60)
+            pygame.mouse.set_cursor(
+                cursor_mao
+            )
 
-        mouse_pos = pygame.mouse.get_pos()
-
-        # Efeito
-        cor_iniciar = AZUL_HOVER if botao_iniciar.collidepoint(mouse_pos) else AZUL
-        cor_sair = CINZA_HOVER if botao_sair.collidepoint(mouse_pos) else CINZA
-
-        # Desenhar botões
-        desenhar_botao(botao_iniciar, cor_iniciar, "Iniciar", fonte_botao, BRANCO)
-        desenhar_botao(botao_sair, cor_sair, "Sair", fonte_botao, PRETO)
-
-        # Cursor mão
-        if botao_iniciar.collidepoint(mouse_pos) or botao_sair.collidepoint(mouse_pos):
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
-        # Eventos
+            pygame.mouse.set_cursor(
+                cursor_seta
+            )
+
+
+        texto=fonte_input.render(
+            nome,
+            True,
+            BRANCO
+        )
+
+        tela.blit(
+            texto,
+            (
+                caixa_texto.x+15,
+                caixa_texto.y+10
+            )
+        )
+
+
+        if ativo:
+
+            if pygame.time.get_ticks()%800<400:
+
+                x_cursor=(
+                    caixa_texto.x
+                    +15
+                    +texto.get_width()
+                )
+
+                pygame.draw.line(
+                    tela,
+                    BRANCO,
+                    (
+                        x_cursor,
+                        caixa_texto.y+10
+                    ),
+                    (
+                        x_cursor,
+                        caixa_texto.y+45
+                    ),
+                    3
+                )
+
+
         for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
+
+            if evento.type==pygame.QUIT:
+
                 pygame.quit()
                 sys.exit()
 
-            if evento.type == pygame.MOUSEBUTTONDOWN:
-                if botao_iniciar.collidepoint(mouse_pos):
-                    personagem = escolha_personagem()
-                    print("Personagem escolhido:", personagem)
 
-                if botao_sair.collidepoint(mouse_pos):
-                    pygame.quit()
-                    sys.exit()
+            elif evento.type==pygame.MOUSEBUTTONDOWN:
+
+                if botao_voltar.collidepoint(
+                    evento.pos
+                ):
+
+                    return None
+
+
+                ativo=caixa_texto.collidepoint(
+                    evento.pos
+                )
+
+
+            elif evento.type==pygame.KEYDOWN and ativo:
+
+                if evento.key==pygame.K_RETURN:
+
+                    if nome.strip()!="":
+
+                        return nome
+
+
+                elif evento.key==pygame.K_BACKSPACE:
+
+                    nome=nome[:-1]
+
+
+                else:
+
+                    novo=nome+evento.unicode
+
+                    largura=fonte_input.render(
+                        novo,
+                        True,
+                        BRANCO
+                    ).get_width()
+
+                    if largura<390:
+
+                        nome+=evento.unicode
+
 
         pygame.display.update()
+        clock.tick(60)
+
+
+# ==========================
+# MENU
+# ==========================
+
+def menu():
+
+    pygame.mixer.music.load(
+        "assets/sons/menu_e_escolha_dos_personagens.mp3"
+    )
+
+    pygame.mixer.music.set_volume(
+        0.3
+    )
+
+    pygame.mixer.music.play(-1)
+
+    while True:
+
+        ret,frame=video.read()
+
+        if not ret:
+
+            video.set(
+                cv2.CAP_PROP_POS_FRAMES,
+                0
+            )
+
+            ret,frame=video.read()
+
+
+        frame=cv2.resize(
+            frame,
+            (LARGURA,ALTURA)
+        )
+
+        frame=cv2.cvtColor(
+            frame,
+            cv2.COLOR_BGR2RGB
+        )
+
+        frame=pygame.surfarray.make_surface(
+            frame.swapaxes(0,1)
+        )
+
+        tela.blit(
+            frame,
+            (0,0)
+        )
+
+
+        mouse=pygame.mouse.get_pos()
+
+
+        area_iniciar=pygame.Rect(
+            285,
+            255,
+            235,
+            65
+        )
+
+        area_sair=pygame.Rect(
+            285,
+            335,
+            235,
+            65
+        )
+
+
+        if (
+            area_iniciar.collidepoint(mouse)
+            or
+            area_sair.collidepoint(mouse)
+        ):
+
+            pygame.mouse.set_cursor(
+                cursor_mao
+            )
+
+        else:
+
+            pygame.mouse.set_cursor(
+                cursor_seta
+            )
+
+
+        for evento in pygame.event.get():
+
+            if evento.type==pygame.QUIT:
+
+                video.release()
+
+                pygame.quit()
+
+                sys.exit()
+
+
+            if evento.type==pygame.MOUSEBUTTONDOWN:
+
+
+                if area_iniciar.collidepoint(mouse):
+
+
+                    personagem=escolha_personagem()
+
+                    if personagem is None:
+                        continue
+
+
+                    nome=criar_nome_presidente()
+
+                    if nome is None:
+                        continue
+
+
+                    pygame.mixer.music.stop()
+
+
+                    from fases.introducao import animacao_aviao
+                    from fases.introducao import intro_aeroporto
+
+
+                    animacao_aviao()
+
+                    intro_aeroporto(
+                        personagem,
+                        nome
+                    )
+
+
+                    pygame.mixer.music.play(-1)
+
+
+
+                if area_sair.collidepoint(mouse):
+
+                    video.release()
+
+                    pygame.quit()
+
+                    sys.exit()
+
+
+        pygame.display.update()
+
+        clock.tick(60)
+
 
 menu()
