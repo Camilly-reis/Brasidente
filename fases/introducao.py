@@ -90,28 +90,38 @@ def animacao_aviao():
     # ==========================
 
     pygame.mixer.music.load(
-        "assets/sons/aviao.mp3"
+        "assets/sons/aviao_pousando.mp3"
     )
 
     pygame.mixer.music.set_volume(
         0.5
     )
 
-    # toca 1 vez
-    pygame.mixer.music.play(-1)
+    # inicia áudio
+    pygame.mixer.music.play()
 
 
     while True:
 
         ret, frame = video.read()
 
-        # reinicia vídeo
+
+        # ==========================
+        # REINICIAR VÍDEO + SOM
+        # ==========================
+
         if not ret:
 
+            # volta vídeo
             video.set(
                 cv2.CAP_PROP_POS_FRAMES,
                 0
             )
+
+            # reinicia som
+            pygame.mixer.music.stop()
+
+            pygame.mixer.music.play()
 
             continue
 
@@ -155,27 +165,17 @@ def animacao_aviao():
             x = (
                 LARGURA
                 - render1.get_width()
-            ) // 2
+            )//2
 
-
-            # linha esquerda
 
             pygame.draw.line(
                 tela,
                 (180,180,180),
-                (
-                    x-90,
-                    545
-                ),
-                (
-                    x-20,
-                    545
-                ),
+                (x-90,545),
+                (x-20,545),
                 2
             )
 
-
-            # linha direita
 
             pygame.draw.line(
                 tela,
@@ -212,7 +212,7 @@ def animacao_aviao():
             x2 = (
                 LARGURA
                 - render2.get_width()
-            ) // 2
+            )//2
 
 
             desenhar_texto_pixel(
@@ -256,7 +256,6 @@ def animacao_aviao():
         pygame.display.update()
 
         clock.tick(60)
-
 
 
 animacao_aviao()
