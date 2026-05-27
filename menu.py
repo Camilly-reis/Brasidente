@@ -5,6 +5,15 @@ import sys
 pygame.init()
 pygame.mixer.init()
 
+som_clique = None
+try:
+    som_clique = pygame.mixer.Sound(
+        "assets/sons/Cliquee.mpeg.wav"
+    )
+    som_clique.set_volume(0.5)
+except (pygame.error, FileNotFoundError):
+    som_clique = None
+
 # ==========================
 # TELA
 # ==========================
@@ -102,6 +111,15 @@ def desenhar_texto_pixel(
 # ESCOLHA PERSONAGEM
 # ==========================
 
+def tocar_clique():
+    if som_clique is None:
+        return
+    try:
+        som_clique.play()
+    except pygame.error:
+        pass
+
+
 def escolha_personagem():
 
     fundo=pygame.image.load(
@@ -164,10 +182,12 @@ def escolha_personagem():
 
                 if area_masc.collidepoint(mouse):
 
+                    tocar_clique()
                     return "masculino"
 
                 if area_fem.collidepoint(mouse):
 
+                    tocar_clique()
                     return "feminino"
 
         pygame.display.update()
@@ -292,6 +312,7 @@ def criar_nome_presidente():
                     evento.pos
                 ):
 
+                    tocar_clique()
                     return None
 
 
@@ -306,6 +327,7 @@ def criar_nome_presidente():
 
                     if nome.strip()!="":
 
+                        tocar_clique()
                         return nome
 
 
@@ -434,7 +456,7 @@ def menu():
 
                 if area_iniciar.collidepoint(mouse):
 
-
+                    tocar_clique()
                     personagem=escolha_personagem()
 
                     if personagem is None:
@@ -468,6 +490,7 @@ def menu():
 
                 if area_sair.collidepoint(mouse):
 
+                    tocar_clique()
                     video.release()
 
                     pygame.quit()
