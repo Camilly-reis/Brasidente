@@ -18,14 +18,23 @@ pygame.display.set_caption(
 
 clock = pygame.time.Clock()
 
-# vídeo
+# ==========================
+# VÍDEO
+# ==========================
+
 video = cv2.VideoCapture(
     "assets/videos/aviao.mp4"
 )
 
-BRANCO = (255,255,255)
-PRETO = (0,0,0)
+# pega FPS original do vídeo
+fps = video.get(cv2.CAP_PROP_FPS)
 
+# segurança caso o FPS venha 0
+if fps == 0:
+    fps = 30
+
+BRANCO = (255, 255, 255)
+PRETO = (0, 0, 0)
 
 # ==========================
 # TEXTO PIXEL
@@ -52,17 +61,17 @@ def desenhar_texto_pixel(
         contorno
     )
 
-    for dx in [-2,2]:
-        for dy in [-2,2]:
+    for dx in [-2, 2]:
+        for dy in [-2, 2]:
 
             tela.blit(
                 sombra,
-                (x+dx,y+dy)
+                (x + dx, y + dy)
             )
 
     tela.blit(
         base,
-        (x,y)
+        (x, y)
     )
 
 
@@ -84,7 +93,6 @@ def animacao_aviao():
         bold=True
     )
 
-
     # ==========================
     # SOM
     # ==========================
@@ -100,11 +108,9 @@ def animacao_aviao():
     # inicia áudio
     pygame.mixer.music.play()
 
-
     while True:
 
         ret, frame = video.read()
-
 
         # ==========================
         # REINICIAR VÍDEO + SOM
@@ -112,7 +118,7 @@ def animacao_aviao():
 
         if not ret:
 
-            # volta vídeo
+            # volta vídeo para início
             video.set(
                 cv2.CAP_PROP_POS_FRAMES,
                 0
@@ -120,11 +126,13 @@ def animacao_aviao():
 
             # reinicia som
             pygame.mixer.music.stop()
-
             pygame.mixer.music.play()
 
             continue
 
+        # ==========================
+        # PROCESSAMENTO DO FRAME
+        # ==========================
 
         frame = cv2.resize(
             frame,
@@ -137,21 +145,19 @@ def animacao_aviao():
         )
 
         frame = pygame.surfarray.make_surface(
-            frame.swapaxes(0,1)
+            frame.swapaxes(0, 1)
         )
-
 
         tela.blit(
             frame,
-            (0,0)
+            (0, 0)
         )
-
 
         # ==========================
         # TEXTO PISCANDO
         # ==========================
 
-        if pygame.time.get_ticks()%1000 < 700:
+        if pygame.time.get_ticks() % 1000 < 700:
 
             texto1 = "PRESSIONE ENTER"
             texto2 = "PARA CONTINUAR"
@@ -165,32 +171,29 @@ def animacao_aviao():
             x = (
                 LARGURA
                 - render1.get_width()
-            )//2
-
-
-            pygame.draw.line(
-                tela,
-                (180,180,180),
-                (x-90,545),
-                (x-20,545),
-                2
-            )
-
+            ) // 2
 
             pygame.draw.line(
                 tela,
-                (180,180,180),
+                (180, 180, 180),
+                (x - 90, 545),
+                (x - 20, 545),
+                2
+            )
+
+            pygame.draw.line(
+                tela,
+                (180, 180, 180),
                 (
-                    x+render1.get_width()+20,
+                    x + render1.get_width() + 20,
                     545
                 ),
                 (
-                    x+render1.get_width()+90,
+                    x + render1.get_width() + 90,
                     545
                 ),
                 2
             )
-
 
             desenhar_texto_pixel(
                 texto1,
@@ -201,29 +204,25 @@ def animacao_aviao():
                 520
             )
 
-
             render2 = fonte_secundaria.render(
                 texto2,
                 True,
-                (180,180,180)
+                (180, 180, 180)
             )
-
 
             x2 = (
                 LARGURA
                 - render2.get_width()
-            )//2
-
+            ) // 2
 
             desenhar_texto_pixel(
                 texto2,
                 fonte_secundaria,
-                (180,180,180),
+                (180, 180, 180),
                 PRETO,
                 x2,
                 560
             )
-
 
         # ==========================
         # EVENTOS
@@ -241,7 +240,6 @@ def animacao_aviao():
 
                 sys.exit()
 
-
             if evento.type == pygame.KEYDOWN:
 
                 if evento.key == pygame.K_RETURN:
@@ -252,10 +250,10 @@ def animacao_aviao():
 
                     return
 
-
         pygame.display.update()
 
-        clock.tick(60)
+        # roda vídeo no FPS original
+        clock.tick(fps)
 
 
 animacao_aviao()
