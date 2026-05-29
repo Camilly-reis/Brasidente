@@ -5,6 +5,10 @@ import sys
 pygame.init()
 pygame.mixer.init()
 
+# ==========================
+# TELA
+# ==========================
+
 LARGURA = 800
 ALTURA = 600
 
@@ -13,28 +17,17 @@ tela = pygame.display.set_mode(
 )
 
 pygame.display.set_caption(
-    "Vídeo Avião"
+    "Introdução"
 )
 
 clock = pygame.time.Clock()
 
 # ==========================
-# VÍDEO
+# CORES
 # ==========================
 
-video = cv2.VideoCapture(
-    "assets/videos/aviao.mp4"
-)
-
-# pega FPS original do vídeo
-fps = video.get(cv2.CAP_PROP_FPS)
-
-# segurança caso o FPS venha 0
-if fps == 0:
-    fps = 30
-
-BRANCO = (255, 255, 255)
-PRETO = (0, 0, 0)
+BRANCO = (255,255,255)
+PRETO = (0,0,0)
 
 # ==========================
 # TEXTO PIXEL
@@ -61,25 +54,38 @@ def desenhar_texto_pixel(
         contorno
     )
 
-    for dx in [-2, 2]:
-        for dy in [-2, 2]:
+    for dx in [-2,2]:
+        for dy in [-2,2]:
 
             tela.blit(
                 sombra,
-                (x + dx, y + dy)
+                (x+dx,y+dy)
             )
 
     tela.blit(
         base,
-        (x, y)
+        (x,y)
     )
 
-
 # ==========================
-# ANIMAÇÃO AVIÃO
+# FUNÇÃO BASE VÍDEO
 # ==========================
 
-def animacao_aviao():
+def tocar_video(
+    caminho_video,
+    caminho_audio=None
+):
+
+    video = cv2.VideoCapture(
+        caminho_video
+    )
+
+    fps = video.get(
+        cv2.CAP_PROP_FPS
+    )
+
+    if fps == 0:
+        fps = 30
 
     fonte_principal = pygame.font.SysFont(
         "consolas",
@@ -97,41 +103,44 @@ def animacao_aviao():
     # SOM
     # ==========================
 
-    pygame.mixer.music.load(
-        "assets/sons/aviao_pousando.mp3"
-    )
+    if caminho_audio:
 
-    pygame.mixer.music.set_volume(
-        0.5
-    )
+        pygame.mixer.music.load(
+            caminho_audio
+        )
 
-    # inicia áudio
-    pygame.mixer.music.play()
+        pygame.mixer.music.set_volume(
+            0.5
+        )
+
+        pygame.mixer.music.play()
 
     while True:
 
         ret, frame = video.read()
 
         # ==========================
-        # REINICIAR VÍDEO + SOM
+        # REINICIA VÍDEO
         # ==========================
 
         if not ret:
 
-            # volta vídeo para início
             video.set(
                 cv2.CAP_PROP_POS_FRAMES,
                 0
             )
 
-            # reinicia som
-            pygame.mixer.music.stop()
-            pygame.mixer.music.play()
+            # reinicia áudio junto
+            if caminho_audio:
+
+                pygame.mixer.music.stop()
+
+                pygame.mixer.music.play()
 
             continue
 
         # ==========================
-        # PROCESSAMENTO DO FRAME
+        # FRAME
         # ==========================
 
         frame = cv2.resize(
@@ -145,19 +154,19 @@ def animacao_aviao():
         )
 
         frame = pygame.surfarray.make_surface(
-            frame.swapaxes(0, 1)
+            frame.swapaxes(0,1)
         )
 
         tela.blit(
             frame,
-            (0, 0)
+            (0,0)
         )
 
         # ==========================
-        # TEXTO PISCANDO
+        # TEXTO
         # ==========================
 
-        if pygame.time.get_ticks() % 1000 < 700:
+        if pygame.time.get_ticks()%1000 < 700:
 
             texto1 = "PRESSIONE ENTER"
             texto2 = "PARA CONTINUAR"
@@ -173,23 +182,27 @@ def animacao_aviao():
                 - render1.get_width()
             ) // 2
 
-            pygame.draw.line(
-                tela,
-                (180, 180, 180),
-                (x - 90, 545),
-                (x - 20, 545),
-                2
-            )
+            # linha esquerda
 
             pygame.draw.line(
                 tela,
-                (180, 180, 180),
+                (180,180,180),
+                (x-90,545),
+                (x-20,545),
+                2
+            )
+
+            # linha direita
+
+            pygame.draw.line(
+                tela,
+                (180,180,180),
                 (
-                    x + render1.get_width() + 20,
+                    x+render1.get_width()+20,
                     545
                 ),
                 (
-                    x + render1.get_width() + 90,
+                    x+render1.get_width()+90,
                     545
                 ),
                 2
@@ -207,7 +220,7 @@ def animacao_aviao():
             render2 = fonte_secundaria.render(
                 texto2,
                 True,
-                (180, 180, 180)
+                (180,180,180)
             )
 
             x2 = (
@@ -218,7 +231,7 @@ def animacao_aviao():
             desenhar_texto_pixel(
                 texto2,
                 fonte_secundaria,
-                (180, 180, 180),
+                (180,180,180),
                 PRETO,
                 x2,
                 560
@@ -252,8 +265,40 @@ def animacao_aviao():
 
         pygame.display.update()
 
-        # roda vídeo no FPS original
         clock.tick(fps)
 
+# ==========================
+# VÍDEOS INTRODUÇÃO
+# ==========================
 
-animacao_aviao()
+def animacao_aviao():
+
+    tocar_video(
+        "assets/videos/aviao.mp4",
+        "assets/sons/aviao_pousando.mp3"
+    )
+
+
+def saindo_do_aviao():
+
+    tocar_video(
+        "assets/videos/saindo_do_aviao.mp4"
+    )
+
+
+def no_carro_presidente():
+
+    tocar_video(
+        "assets/videos/no_carro_presidente.mp4"
+    )
+
+def intro_aeroporto(
+    personagem,
+    nome
+):
+
+    tocar_video(
+        "assets/videos/intro_aeroporto.mp4",
+        "assets/sons/intro_aeroporto.mp3"
+    )
+
