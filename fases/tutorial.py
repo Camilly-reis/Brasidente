@@ -86,11 +86,13 @@ def carregar_frames(caminho):
 # TUTORIAL
 # =========================
 
-def tutorial():
+def tutorial(personagem, nome):
+    print("Personagem: ", personagem)
+    print("Nome: ", nome)
 
     fundo = pygame.image.load(
         "assets/imagens/fundo_tutorial.jpeg"
-    ).convert()
+    ).convert_alpha()
 
     fundo = pygame.transform.scale(
         fundo,
@@ -101,38 +103,56 @@ def tutorial():
         "consolas",
         18
     )
+    # =========================
+# PERSONAGEM MASCULINO
+# =========================
+    if personagem == "masculino":
+
+        frames = carregar_frames(
+            "assets/personagens/presidente_masculino_tutorial.png"
+        )
+
+        LARGURA_PERSONAGEM = 122
+        ALTURA_PERSONAGEM = 162
+
+        personagem_x = 580
+        personagem_y = 330
+
+    else:
+        
+        frames = carregar_frames(
+            "assets/personagens/presidente_feminino_tutorial.png"
+        )
+        LARGURA_PERSONAGEM = 122
+        ALTURA_PERSONAGEM = 162
+
+        personagem_x = 580
+        personagem_y = 330
+        
 
     # =========================
-    # PERSONAGEM MASCULINO
-    # =========================
-
-    frames = carregar_frames(
-        "assets/personagens/presidente_masculino_tutorial.png"
-    )
-
-    # =========================
-    # PERSONAGEM FEMININA
+    # NPC FEMININA
     # =========================
 
     personagem_feminina = pygame.image.load(
         "assets/personagens/personagem_feminina_tutorial.png"
     ).convert_alpha()
 
-    LARGURA_FEMININA = 90
-    ALTURA_FEMININA = 120
+    # Remove transparências externas
+    rect = personagem_feminina.get_bounding_rect()
 
-    feminina_x = 680
+    if rect.width > 0 and rect.height > 0:
+        personagem_feminina = personagem_feminina.subsurface(rect)
+
+    LARGURA_FEMININA = 176
+    ALTURA_FEMININA = 189
+
+    feminina_x = 690
     feminina_y = 330
 
     # =========================
-    # PERSONAGEM MASCULINO
+    # CONTROLE
     # =========================
-
-    LARGURA_PERSONAGEM = 90
-    ALTURA_PERSONAGEM = 120
-
-    personagem_x = 580
-    personagem_y = 330
 
     velocidade = 4
 
@@ -142,6 +162,10 @@ def tutorial():
     olhando_direita = True
 
     mostrar_dialogo = False
+
+    # =========================
+    # LOOP PRINCIPAL
+    # =========================
 
     while True:
 
@@ -313,8 +337,3 @@ def tutorial():
         clock.tick(60)
 
 
-# =========================
-# INICIAR
-# =========================
-
-tutorial()
