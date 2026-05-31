@@ -360,7 +360,7 @@ def tutorial(personagem, nome):
             )
 
             desenhar_texto_pixel(
-                "Seja bem-vindo(a)! Use A e D para andar e E para interagir.",
+                "Seja bem-vindo(a)! Use teclas para andar e E para",
                 fonte_dialogo,
                 BRANCO,
                 PRETO,
@@ -369,7 +369,7 @@ def tutorial(personagem, nome):
             )
 
             desenhar_texto_pixel(
-                "Agora pressione ENTER para continuar.",
+                "interagir. Agora pressione ENTER para continuar.",
                 fonte_dialogo,
                 BRANCO,
                 PRETO,
