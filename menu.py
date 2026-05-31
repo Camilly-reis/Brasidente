@@ -29,11 +29,10 @@ def tocar_clique():
 # TELA
 # =========================
 
-LARGURA = 800
-ALTURA = 600
-
-tela = pygame.display.set_mode((LARGURA, ALTURA))
-pygame.display.set_caption("BRASIDENTE")
+LARGURA = 800 
+ALTURA = 600 
+tela = pygame.display.set_mode((LARGURA, ALTURA)) 
+pygame.display.set_caption("BRASIDENTE") 
 
 clock = pygame.time.Clock()
 

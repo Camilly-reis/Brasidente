@@ -87,8 +87,15 @@ def carregar_frames(caminho):
 # =========================
 
 def tutorial(personagem, nome):
-    print("Personagem: ", personagem)
-    print("Nome: ", nome)
+
+    pygame.mouse.set_cursor(
+        pygame.cursors.Cursor(
+            pygame.SYSTEM_CURSOR_ARROW
+        )
+    )
+
+    print("Personagem:", personagem)
+    print("Nome:", nome)
 
     fundo = pygame.image.load(
         "assets/imagens/fundo_tutorial.jpeg"
@@ -103,32 +110,28 @@ def tutorial(personagem, nome):
         "consolas",
         18
     )
+
     # =========================
-# PERSONAGEM MASCULINO
-# =========================
+    # PERSONAGEM PRINCIPAL
+    # =========================
+
     if personagem == "masculino":
 
         frames = carregar_frames(
             "assets/personagens/presidente_masculino_tutorial.png"
         )
 
-        LARGURA_PERSONAGEM = 122
-        ALTURA_PERSONAGEM = 162
-
-        personagem_x = 580
-        personagem_y = 330
-
     else:
-        
+
         frames = carregar_frames(
             "assets/personagens/presidente_feminino_tutorial.png"
         )
-        LARGURA_PERSONAGEM = 122
-        ALTURA_PERSONAGEM = 162
 
-        personagem_x = 580
-        personagem_y = 330
-        
+    LARGURA_PERSONAGEM = 122
+    ALTURA_PERSONAGEM = 162
+
+    personagem_x = 580
+    personagem_y = 330
 
     # =========================
     # NPC FEMININA
@@ -138,7 +141,6 @@ def tutorial(personagem, nome):
         "assets/personagens/personagem_feminina_tutorial.png"
     ).convert_alpha()
 
-    # Remove transparências externas
     rect = personagem_feminina.get_bounding_rect()
 
     if rect.width > 0 and rect.height > 0:
@@ -162,12 +164,36 @@ def tutorial(personagem, nome):
     olhando_direita = True
 
     mostrar_dialogo = False
+    tutorial_concluido = False
 
     # =========================
-    # LOOP PRINCIPAL
+    # LOOP
     # =========================
 
     while True:
+
+        personagem_rect = pygame.Rect(
+            personagem_x,
+            personagem_y,
+            LARGURA_PERSONAGEM,
+            ALTURA_PERSONAGEM
+        )
+
+        npc_rect = pygame.Rect(
+            feminina_x,
+            feminina_y,
+            LARGURA_FEMININA,
+            ALTURA_FEMININA
+        )
+
+        area_interacao = npc_rect.inflate(
+            80,
+            40
+        )
+
+        perto_npc = personagem_rect.colliderect(
+            area_interacao
+        )
 
         # =========================
         # EVENTOS
@@ -182,10 +208,19 @@ def tutorial(personagem, nome):
 
             if evento.type == pygame.KEYDOWN:
 
+                # Interagir somente perto da NPC
                 if evento.key == pygame.K_e:
-                    mostrar_dialogo = True
 
-                if evento.key == pygame.K_RETURN:
+                    if perto_npc:
+
+                        mostrar_dialogo = True
+                        tutorial_concluido = True
+
+                # Continuar somente após interação
+                if (
+                    evento.key == pygame.K_RETURN
+                    and tutorial_concluido
+                ):
                     return
 
         teclas = pygame.key.get_pressed()
@@ -246,9 +281,7 @@ def tutorial(personagem, nome):
             (0, 0)
         )
 
-        # =========================
-        # FEMININA (PARADA)
-        # =========================
+        # NPC
 
         sprite_feminina = pygame.transform.scale(
             personagem_feminina,
@@ -266,9 +299,20 @@ def tutorial(personagem, nome):
             )
         )
 
-        # =========================
-        # MASCULINO (ANIMADO)
-        # =========================
+        # Mostrar aviso de interação
+
+        if perto_npc:
+
+            desenhar_texto_pixel(
+                "PRESSIONE E",
+                fonte_dialogo,
+                AMARELO,
+                PRETO,
+                feminina_x + 10,
+                feminina_y - 30
+            )
+
+        # Personagem
 
         sprite = pygame.transform.scale(
             frames[frame_atual],
@@ -303,37 +347,46 @@ def tutorial(personagem, nome):
             pygame.draw.rect(
                 tela,
                 (10, 10, 10),
-                (150, 520, 500, 50),
+                (120, 500, 560, 70),
                 border_radius=10
             )
 
             pygame.draw.rect(
                 tela,
                 AMARELO,
-                (150, 520, 500, 50),
+                (120, 500, 560, 70),
                 2,
                 border_radius=10
             )
 
             desenhar_texto_pixel(
-                "Voce pressionou E para interagir.",
+                "Seja bem-vindo(a)! Use A e D para andar e E para interagir.",
                 fonte_dialogo,
                 BRANCO,
                 PRETO,
-                185,
-                535
+                140,
+                520
             )
 
-        desenhar_texto_pixel(
-            "APERTE ENTER PARA CONTINUAR",
-            fonte_dialogo,
-            BRANCO,
-            PRETO,
-            250,
-            60
-        )
+            desenhar_texto_pixel(
+                "Agora pressione ENTER para continuar.",
+                fonte_dialogo,
+                BRANCO,
+                PRETO,
+                140,
+                545
+            )
+
+        else:
+
+            desenhar_texto_pixel(
+                "Aproxime-se da personagem e pressione E.",
+                fonte_dialogo,
+                BRANCO,
+                PRETO,
+                210,
+                60
+            )
 
         pygame.display.update()
         clock.tick(60)
-
-
